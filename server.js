@@ -11,37 +11,39 @@ app.use(cors({
 // Para parsear JSON en las solicitudes
 app.use(express.json());
 
-// Variables para almacenar los valores de los sensores
-let temperatura = 0;
-let ph = 0;
-let humedad = 0;
-let oxigeno = 0;
-let turbidez = 0;
+// Objeto para almacenar los valores de los sensores
+let sensores = {
+  temperatura: 0,
+  ph: 0,
+  humedad: 0,
+  oxigeno: 0,
+  turbidez: 0
+};
 
 // Función para actualizar los valores de los sensores
-const actualizarValor = (req, res, variable, nombre) => {
+const actualizarValor = (req, res, variable) => {
   const { nuevoNumero } = req.body;
   if (typeof nuevoNumero === 'number' && !isNaN(nuevoNumero)) {
-    global[variable] = nuevoNumero;
-    res.status(200).json({ message: `${nombre} actualizado correctamente`, [nombre]: nuevoNumero });
+    sensores[variable] = nuevoNumero;
+    res.status(200).json({ message: `${variable} actualizado correctamente`, [variable]: nuevoNumero });
   } else {
-    res.status(400).json({ message: `El valor enviado para ${nombre} no es válido` });
+    res.status(400).json({ message: `El valor enviado para ${variable} no es válido` });
   }
 };
 
 // Rutas para actualizar
-app.post('/actualizarTemperatura', (req, res) => actualizarValor(req, res, 'temperatura', 'temperatura'));
-app.post('/actualizarPH', (req, res) => actualizarValor(req, res, 'ph', 'ph'));
-app.post('/actualizarHumedad', (req, res) => actualizarValor(req, res, 'humedad', 'humedad'));
-app.post('/actualizarOxigeno', (req, res) => actualizarValor(req, res, 'oxigeno', 'oxigeno'));
-app.post('/actualizarTurbidez', (req, res) => actualizarValor(req, res, 'turbidez', 'turbidez'));
+app.post('/actualizarTemperatura', (req, res) => actualizarValor(req, res, 'temperatura'));
+app.post('/actualizarPH', (req, res) => actualizarValor(req, res, 'ph'));
+app.post('/actualizarHumedad', (req, res) => actualizarValor(req, res, 'humedad'));
+app.post('/actualizarOxigeno', (req, res) => actualizarValor(req, res, 'oxigeno'));
+app.post('/actualizarTurbidez', (req, res) => actualizarValor(req, res, 'turbidez'));
 
 // Rutas para consultar
-app.get('/temperatura', (req, res) => res.status(200).json({ temperatura }));
-app.get('/ph', (req, res) => res.status(200).json({ ph }));
-app.get('/humedad', (req, res) => res.status(200).json({ humedad }));
-app.get('/oxigeno', (req, res) => res.status(200).json({ oxigeno }));
-app.get('/turbidez', (req, res) => res.status(200).json({ turbidez }));
+app.get('/temperatura', (req, res) => res.status(200).json({ temperatura: sensores.temperatura }));
+app.get('/ph', (req, res) => res.status(200).json({ ph: sensores.ph }));
+app.get('/humedad', (req, res) => res.status(200).json({ humedad: sensores.humedad }));
+app.get('/oxigeno', (req, res) => res.status(200).json({ oxigeno: sensores.oxigeno }));
+app.get('/turbidez', (req, res) => res.status(200).json({ turbidez: sensores.turbidez }));
 
 // Configuración del puerto de consulta
 const PORT = 3000;
