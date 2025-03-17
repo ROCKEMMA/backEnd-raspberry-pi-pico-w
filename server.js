@@ -1,41 +1,38 @@
-// Requiriendo las dependencias necesarias
 var express = require('express');
 var cors = require('cors');
 
-// Crear una instancia de la aplicación Express
 var app = express();
 
 // Usar CORS para permitir solicitudes desde cualquier origen
 app.use(cors({
-  origin: '*', // Permite solicitudes de cualquier origen
+  origin: '*',
 }));
 
-// Middlewares para la configuración básica de Express
-app.use(express.json()); // Para parsear JSON en las solicitudes
+// Para parsear JSON en las solicitudes
+app.use(express.json());
 
-// Variable para almacenar el número
-let numero = 0;  // Valor inicial de la variable
+// Variable para almacenar los valores de los sensores
+let temperatura = 0;
 
-// Ruta para actualizar el número
-app.post('/actualizar', (req, res) => {
-  // Verificar que el número se pasa en el cuerpo de la solicitud
+// Ruta para actualizar la temperatura
+app.post('/actualizarTemperatura', (req, res) => {
   const { nuevoNumero } = req.body;
 
-  // Validar que el número sea un entero
-  if (Number.isInteger(nuevoNumero)) {
-    numero = nuevoNumero; // Actualizar el valor de la variable
-    res.status(200).send({ message: 'Número actualizado correctamente', numero });
+  // Validar si es un número
+  if (typeof nuevoNumero === 'number' && !isNaN(nuevoNumero)) {
+    temperatura = nuevoNumero;
+    res.status(200).json({ message: 'Temperatura actualizada correctamente', temperatura });
   } else {
-    res.status(400).send({ message: 'El valor enviado no es un número entero válido' });
+    res.status(400).json({ message: 'El valor enviado no es un número válido' });
   }
 });
 
-// Ruta para consultar el valor actual del número
-app.get('/valor', (req, res) => {
-  res.status(200).send({ numero });
+// Ruta para consultar la temperatura
+app.get('/temperatura', (req, res) => {
+  res.status(200).json({ temperatura });
 });
 
-// Configurar el puerto en el que se escucharán las solicitudes
+// Configuración del puerto de consulta
 const PORT = 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor escuchando en http://45.56.113.215:${PORT}`);
