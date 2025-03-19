@@ -17,12 +17,13 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 const credentials = {
-  key: fs.readFileSync('./key.pem', 'utf8'),
-  cert: fs.readFileSync('./cert.pem', 'utf8') };
+  key: fs.readFileSync('/etc/letsencrypt/live/tilapias360.duckdns.org/privkey.pem', 'utf8'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/tilapias360.duckdns.org/fullchain.pem', 'utf8')
+};
 
 // Crear servidor HTTPS
 https.createServer(credentials, app).listen(PORT, () => {
-  console.log(`Servidor HTTPS escuchando en https://45.56.113.215:${PORT}`);
+  console.log(`Servidor HTTPS escuchando en https://tilapias360.duckdns.org:${PORT}`);
 });
 
 // Objeto para almacenar los valores de los sensores
@@ -60,7 +61,5 @@ app.get('/ph', (req, res) => res.status(200).json({ ph: sensores.ph }));
 app.get('/humedad', (req, res) => res.status(200).json({ humedad: sensores.humedad }));
 app.get('/oxigeno', (req, res) => res.status(200).json({ oxigeno: sensores.oxigeno }));
 app.get('/turbidez', (req, res) => res.status(200).json({ turbidez: sensores.turbidez }));
-
-
 
 module.exports = app;
