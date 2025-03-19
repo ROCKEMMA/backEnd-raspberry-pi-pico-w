@@ -2,12 +2,13 @@ var express = require('express');
 var cors = require('cors');
 var https = require('https');
 var fs = require('fs');
+var http = require('http');
 
 var app = express();
 
 // Usar CORS para permitir solicitudes desde cualquier origen
 app.use(cors({
-  origin: '*',  // Puedes cambiar esto por un dominio específico en el futuro
+  origin: '*'  // Puedes cambiar esto por un dominio específico en el futuro
 }));
 
 // Para parsear JSON en las solicitudes
@@ -50,22 +51,28 @@ app.get('/oxigeno', (req, res) => res.status(200).json({ oxigeno: sensores.oxige
 app.get('/turbidez', (req, res) => res.status(200).json({ turbidez: sensores.turbidez }));
 
 // Configuración del puerto de consulta
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// Para servir contenido sobre HTTPS (si tienes el certificado)
+// Verificar si estamos en entorno de producción o desarrollo
 if (process.env.NODE_ENV === 'production') {
-  // Leer los certificados SSL
-  const privateKey = fs.readFileSync('path/to/privkey.pem', 'utf8');
-  const certificate = fs.readFileSync('path/to/cert.pem', 'utf8');
-  const ca = fs.readFileSync('path/to/chain.pem', 'utf8');
+  // Si estamos en producción, asegurémonos de tener los certificados SSL
+  try {
+    const privateKey = fs.readFileSync('path/to/privkey.pem', 'utf8');
+    const certificate = fs.readFileSync('path/to/cert.pem', 'utf8');
+    const ca = fs.readFileSync('path/to/chain.pem', 'utf8');
 
-  const credentials = { key: privateKey, cert: certificate, ca: ca };
+    const credentials = { key: privateKey, cert: certificate, ca: ca };
 
-  https.createServer(credentials, app).listen(PORT, () => {
-    console.log(`Servidor HTTPS escuchando en https://45.56.113.215:${PORT}`);
-  });
+    // Crear servidor HTTPS
+    https.createServer(credentials, app).listen(PORT, () => {
+      console.log(`Servidor HTTPS escuchando en https://45.56.113.215:${PORT}`);
+    });
+  } catch (error) {
+    console.error("No se pudieron cargar los certificados SSL. Asegúrate de tenerlos configurados correctamente.");
+    process.exit(1);  // Termina el proceso si no hay certificados válidos
+  }
 } else {
-  // Si no se necesita HTTPS, puedes usar HTTP
+  // Si estamos en desarrollo, usar HTTP
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Servidor HTTP escuchando en http://45.56.113.215:${PORT}`);
   });
