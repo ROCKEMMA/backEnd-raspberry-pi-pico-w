@@ -8,7 +8,7 @@ var app = express();
 
 // Usar CORS para permitir solicitudes desde cualquier origen
 app.use(cors({
-  origin: '*'  // Puedes cambiar esto por un dominio específico en el futuro
+  origin: '*'
 }));
 
 // Para parsear JSON en las solicitudes
@@ -57,11 +57,10 @@ const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV === 'production') {
   // Si estamos en producción, asegurémonos de tener los certificados SSL
   try {
-    const privateKey = fs.readFileSync('path/to/privkey.pem', 'utf8');
-    const certificate = fs.readFileSync('path/to/cert.pem', 'utf8');
-    const ca = fs.readFileSync('path/to/chain.pem', 'utf8');
-
-    const credentials = { key: privateKey, cert: certificate, ca: ca };
+    const privateKey = fs.readFileSync('./key.pem', 'utf8'); // Ruta correcta
+    const certificate = fs.readFileSync('./cert.pem', 'utf8'); // Ruta correcta
+    
+    const credentials = { key: privateKey, cert: certificate };
 
     // Crear servidor HTTPS
     https.createServer(credentials, app).listen(PORT, () => {
@@ -69,7 +68,7 @@ if (process.env.NODE_ENV === 'production') {
     });
   } catch (error) {
     console.error("No se pudieron cargar los certificados SSL. Asegúrate de tenerlos configurados correctamente.");
-    process.exit(1);  // Termina el proceso si no hay certificados válidos
+    process.exit(1); // Termina el proceso si no hay certificados válidos
   }
 } else {
   // Si estamos en desarrollo, usar HTTP
